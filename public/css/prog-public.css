@@ -1,0 +1,95 @@
+/*
+progressBar design by Lorin Mühlebach
+*/
+
+.progressBarContainer{
+    height: 1em;
+    width: 100%;
+    border: solid gray 1px;
+    border-radius: 5px;
+    
+    position: relative;
+    margin: 0px auto;
+    padding: 0px;  /*somehow needed*/
+}
+
+.overflow_hidden{
+	position: absolute;
+    width: 100%;
+    height: 100%;
+	overflow: hidden;
+}
+
+.progressBarContainer.noBorder{
+    border: none;
+}
+
+.progressBarContainer.small{
+	height: 0.2em;
+}
+
+.progressBar.small{
+	height: 1px;
+}
+
+.progressBar{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: translateX(-100%);
+}
+
+.blue{
+	background: rgb(150,180,250);
+	transform:translateX(-20%);
+}
+
+.orange{
+	background: rgb(255, 187, 0);
+}
+
+.green{
+	background: rgb(78, 175, 82);
+}
+
+.prog_circle{
+	height: 0.7em;
+	width: 0.7em;
+	position: absolute;
+	top: 0.3em;
+	left: -1.2em;
+	border-radius: 50%;
+}
+
+.progressBar.marker{
+	position: absolute;
+	height: 150%;
+	border-right: solid black 1px;
+	padding: 0;
+	margin: 0;
+}
+
+.progressBar.marker.no_markup{
+	position: absolute;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+    border: none;
+}
+
+.progressBar.marker .circle{
+    position: absolute;
+    right: 0px;
+	top: 0.25em;;
+    height: 0.4em;
+    width: 0.4em;
+    border-radius: 50%;
+}
+
+.progressBar.marker .label{
+	position: absolute;
+	right: -17px;
+	top: 25px;
+	width: 30px;
+	text-align: center;
+}
