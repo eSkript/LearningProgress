@@ -122,7 +122,7 @@ class Prog {
         /**
          * The global helper functions
          */
-        //require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/test.php'; //permissions problems
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/functions.php';
 
 		$this->loader = new Prog_Loader();
 
@@ -169,8 +169,11 @@ class Prog {
         // Save/Update our plugin options
         $this->loader->add_action('admin_init', $plugin_admin, 'options_update');
 		
-		$this->loader->add_action('admin_post_recalculate_statistics', $plugin_admin, 'recalculate_statistics' ); //recalculate button in settings panel
-        $this->loader->add_action('save_post', $plugin_admin, 'recalculate_statistics' ); //recalculate if content is changed
+        $this->loader->add_action('admin_post_get_book_structure', $plugin_admin, 'get_book_structure_and_return_to_console' ); //recalculate button in settings panel
+		$this->loader->add_action('admin_post_recalculate_statistics', $plugin_admin, 'recalculate_statistics_settings' ); //recalculate button in settings panel
+        add_action('save_post','recalculate_stats' ); //recalculate if content is changed
+        
+        add_action('admin_post_delete_data','delete_data' );
 	}
 
 	/**

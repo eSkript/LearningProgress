@@ -21,6 +21,12 @@
     
     <p>This plugin is in development, settings might or might not work</p>
     
+    <p><?php
+        $teststring = "asdf<h1>TEST TEST<p>...</p></h1>qwetpoiuxyv";
+        echo "<br>".$teststring;
+        var_dump(find_html_tag($teststring,"h1",1));
+    ?></p>
+    
     <form method="post" name="cleanup_options" action="options.php">
         
         <?php
@@ -67,6 +73,18 @@
         </fieldset>
         
     <?php submit_button('Save all changes', 'primary','submit', TRUE); ?>
+    </form>
+    
+    <form action="<?php echo admin_url( 'admin-post.php' ); ?>" method="post">
+        <input type="hidden" name="action" value="delete_data">
+        <input type="hidden" name="_wp_http_referer" value="<?php echo $redirect; ?>">
+        <?php submit_button('Delete all user Data'); ?>
+    </form>
+    
+    <form action="<?php echo admin_url( 'admin-post.php' ); ?>" method="post">
+        <input type="hidden" name="action" value="get_book_structure">
+        <input type="hidden" name="_wp_http_referer" value="<?php echo $redirect; ?>">
+        <?php submit_button('Get Book Stucture'); ?>
     </form>
 	
     <h3>Book Statistics</h3>

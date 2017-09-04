@@ -88,6 +88,7 @@ class Prog_Public {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */ 
+        
         wp_register_script($this->plugin_name."js", plugin_dir_url( __FILE__ ) . "js/prog-public.js" );
         wp_enqueue_script($this->plugin_name."js");
         wp_localize_script($this->plugin_name."js", "php_vars", $this->load_data());
@@ -127,11 +128,6 @@ class Prog_Public {
 		return $array;
     }
     
-    //TODO for what is this function?
-    public function initialize(){
-        //add_post_meta($post->ID, 'my-post-information', 'This is my favorite post.' );
-    }
-    
     /*
     *Ajax callback function for saving user bookmarks
     */
@@ -144,6 +140,7 @@ class Prog_Public {
             $bookmarks = Array();
         }
 		
+        
 		$bookmarks[$_POST['book_id']] = Array( "chapter_id" => $_POST['chapter_id'], "subchapter_id" => $_POST['subchapter_id'],"path" => $_POST['path']);
 		
 		echo update_user_meta( get_current_user_id(), 'prog_bookmark', $bookmarks);
@@ -171,71 +168,4 @@ class Prog_Public {
 		
 		wp_die(); // this is required to terminate immediately and return a proper response
 	}
-	
-    
-	/*
-     *Function to calculate the lenght of all chapters in a book
-     *input Press Book book structure
-    */
-    
-    public function book_length($book,$user_prog = null,$lecture_prog = null){
-        $out = Array();
-		$global = Array('charakter' => 0,
-					   	'words' => 0	,
-					   	'h5p' 	=> 0	,
-                        'videos'=> 0    ,
-					   	'img'	=> 0);
-		
-        foreach ($book['part'] as $part) {
-            $title = pb_strip_br( $part['post_title'] );
-            $out[$title] = Array();
-            foreach($part['chapters'] as $chapter){
-				$chapter_data = $this->content_length($chapter['ID'],$user_prog,$lecture_prog);
-				
-				$global['charakter'] += $chapter_data['charakter'];
-				$global['words'] += $chapter_data['words'];
-				$global['h5p'] += $chapter_data['h5p'];
-                $global['videos'] += $chapter_data['videos'];
-				$global['img'] += $chapter_data['img'];
-				
-				if($user_prog != null && $chapter_data['user_prog']){
-					$global['user_prog'] = $global['words'];
-				}
-				
-				if($lecture_prog != null && $chapter_data['lecture_prog']){
-					$global['lecture_prog'] = $global['words'];
-				}
-				
-                $out[$title][$chapter['post_name']]= $chapter_data;
-            }
-        }
-		
-		$out["global"] = $global;
-		return $out;
-    }
-    
-	
-	public function content_length($chapter,$user_prog = null,$lecture_prog = null){
-        $post = get_post($chapter);
-		$content = $post->post_content;
-		
-		$out = Array();
-		$out['charakter'] = strlen(wp_strip_all_tags($content));
-		$out['words'] = str_word_count(wp_strip_all_tags($content));
-		$out['h5p'] = substr_count($content,"[h5p");
-        $out['videos'] = substr_count($content,"</iframe>");
-		$out['img'] = substr_count($content,"img");
-		
-		if($user_prog != null){
-			$out['user_prog'] = $user_prog['post'] == $chapter;
-		}
-		
-		if($lecture_prog != null){
-			$out['lecture_prog'] = $lecture_prog['post'] == $chapter;
-		}
-		
-		return $out;
-    }
-    
-
 }

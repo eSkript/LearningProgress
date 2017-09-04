@@ -35,6 +35,9 @@ class Prog_Activator {
 		$plugin_admin = new Prog_Admin( "prog", "1.0.0");
 		$plugin_admin->recalculate_statistics();
 		*/
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/functions.php';
+        
+        update_blog_option(get_current_blog_id(), "book_structure", get_book_lenght(pb_get_book_structure()));
 	}
 
 }

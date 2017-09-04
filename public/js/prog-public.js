@@ -59,8 +59,46 @@ function calculate_words(book,user_mark,lecture_mark){
 	var lecture_count = false;
 	var chapters = Array();
     var h5p = Object();
+    
+    
 	
 	for(var i=0;i<book.part.length;i++){
+        $.each(book.part[i].chapter,function( index, value ) {
+            //console.log(value);
+            chapters.push(value.words_until_now);
+			
+			if(value.id == user_mark.chapter_id){
+				user_words = value.words_until_now;
+				user_count = true;
+			}
+			
+			if(value.id == lecture_mark.chapter_id){
+				lecture_words = value.words_until_now;
+				lecture_count = true;
+			}
+			
+            words_till_now = value.words_until_now;
+            
+			if(value.subchapters != 0){
+				for(var k=0; k < value.subchapter.length;k++){
+					
+                    words_till_now += value.subchapter[k].words;
+                    
+                    if(value.subchapter[k].h5p != 0){
+                        h5p[words_till_now] = value.subchapter[k].h5p;
+                    }
+					
+					if(value.subchapter[k].id.localeCompare(user_mark.subchapter_id) == 0){
+						user_words = words_till_now;
+					}
+
+					if(value.subchapter[k].id.localeCompare(lecture_mark.subchapter_id) == 0){
+						lecture_words = words_till_now;
+					}
+				}
+			}
+        });
+        /*
 		for(var j=0;j<book.part[i].chapter.length;j++){
 			chapters.push(book.part[i].chapter[j].words_until_now);
 			
@@ -86,28 +124,15 @@ function calculate_words(book,user_mark,lecture_mark){
                     }
 					
 					if(book.part[i].chapter[j].subchapter[k].id.localeCompare(user_mark.subchapter_id) == 0){
-						//book.part[i].chapter[j].subchapter[k].subchapter_title);
-						//console.log(book.part[i].chapter[j].subchapter[k].subchapter_title);
 						user_words = words_till_now;
 					}
 
 					if(book.part[i].chapter[j].subchapter[k].id.localeCompare(lecture_mark.subchapter_id) == 0){
-						//console.log("words: "+words+" subchapter name:"+ book.part[i].chapter[j].subchapter[k].subchapter_title);
 						lecture_words = words_till_now;
 					}
-
-                    /*
-					if(user_mark.subchapter_id.length != 0 && user_count){
-						user_words += book.part[i].chapter[j].subchapter[k].words;
-					}
-
-					if(lecture_mark.subchapter_id.length != 0 && lecture_count){
-						lecture_mark += book.part[i].chapter[j].subchapter[k].words;
-					}
-                    */
 				}
 			}
-		}
+		}*/
 	}
 	var out = Object();
 	
