@@ -62,27 +62,28 @@ function get_book_lenght($book, $include_private = false, $front_back_matter = f
             $doc = new DOMDocument();
             $doc->loadHTML($post);    
             $selector = new DOMXPath($doc);
-            $result = $selector->query('//h1[@class="in-list"]'); //get all h1 elements
+            $result = $selector->query('//h1'); //get all h1 elements
             foreach($result as $index=>$node) {
                 $subchapters[$index]['subchapter_title'] = $node->nodeValue;
                 $subchapters[$index]['id'] = $node->getAttribute('id');
 
                 //get content between subchapters
-                $content = $selector->evaluate('//h1[@class="in-list"]['.($index+1).']/following::text()[count(preceding::h1[@class="in-list"])<='.($index+1).'][not(ancestor::h1)]');
+                $content = $selector->evaluate('//h1['.($index+1).']/following::text()[count(preceding::h1)<='.($index+1).'][not(ancestor::h1)]');
 
                 $text = '';
                 foreach($content as $val){
                     $text .= $val->nodeValue;
                 }
 
-                $count_images = $selector->evaluate('count(//h1[@class="in-list"]['.($index+1).']/following::img[count(preceding::h1[@class="in-list"])<='.($index+1).'])');
-                $count_videos = $selector->evaluate('count(//h1[@class="in-list"]['.($index+1).']/following::iframe[count(preceding::h1[@class="in-list"])<='.($index+1).'])');
+                $count_images = $selector->evaluate('count(//h1['.($index+1).']/following::img[count(preceding::h1)<='.($index+1).'])');
+                $count_videos = $selector->evaluate('count(//h1['.($index+1).']/following::iframe[count(preceding::h1)<='.($index+1).'])');
+                $count_videos += substr_count($text,"https://youtu");
 
                 $subchapters[$index]['words']    = str_word_count($text);
                 $subchapters[$index]['h5p']      = substr_count($text,"[h5p");
                 $subchapters[$index]['videos']   = $count_videos;
                 $subchapters[$index]['img']      = $count_images;
-                $subchapters[$index]['formulas'] = substr_count($text,"$$")/2;
+                $subchapters[$index]['formulas'] = substr_count($text,"$$")/2+substr_count($text,"[latex]");
 
                 $chapter_array['chapter'][$chapter_index]['words']     += $subchapters[$index]['words'];
                 $chapter_array['chapter'][$chapter_index]['h5p']       += $subchapters[$index]['h5p'];

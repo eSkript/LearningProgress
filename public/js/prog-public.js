@@ -1,6 +1,8 @@
 (function ($) {
 	'use strict';
 	console.log(php_vars);
+    
+    
 
     //only manipulate page when the document is ready
     $(function(){
@@ -32,6 +34,7 @@
 
 })(jQuery);
 
+var scroll_cutoff = 40;
 
 function add_continue_btn(){
 	if(php_vars.bookmark.length == 0){
@@ -82,11 +85,7 @@ function calculate_words(book,user_mark,lecture_mark){
 			if(value.subchapters != 0){
 				for(var k=0; k < value.subchapter.length;k++){
 					
-                    words_till_now += value.subchapter[k].words;
                     
-                    if(value.subchapter[k].h5p != 0){
-                        h5p[words_till_now] = value.subchapter[k].h5p;
-                    }
 					
 					if(value.subchapter[k].id.localeCompare(user_mark.subchapter_id) == 0){
 						user_words = words_till_now;
@@ -95,44 +94,15 @@ function calculate_words(book,user_mark,lecture_mark){
 					if(value.subchapter[k].id.localeCompare(lecture_mark.subchapter_id) == 0){
 						lecture_words = words_till_now;
 					}
+                    
+                    words_till_now += value.subchapter[k].words;
+                    
+                    if(value.subchapter[k].h5p != 0){
+                        h5p[words_till_now] = value.subchapter[k].h5p;
+                    }
 				}
 			}
         });
-        /*
-		for(var j=0;j<book.part[i].chapter.length;j++){
-			chapters.push(book.part[i].chapter[j].words_until_now);
-			
-			if(book.part[i].chapter[j].id == user_mark.chapter_id){
-				user_words = book.part[i].chapter[j].words_until_now;
-				user_count = true;
-			}
-			
-			if(book.part[i].chapter[j].id == lecture_mark.chapter_id){
-				lecture_words = book.part[i].chapter[j].words_until_now;
-				lecture_count = true;
-			}
-			
-            words_till_now = book.part[i].chapter[j].words_until_now;
-            
-			if(book.part[i].chapter[j].subchapters != 0){
-				for(var k=0; k < book.part[i].chapter[j].subchapter.length;k++){
-					
-                    words_till_now += book.part[i].chapter[j].subchapter[k].words;
-                    
-                    if(book.part[i].chapter[j].subchapter[k].h5p != 0){
-                        h5p[words_till_now] = book.part[i].chapter[j].subchapter[k].h5p;
-                    }
-					
-					if(book.part[i].chapter[j].subchapter[k].id.localeCompare(user_mark.subchapter_id) == 0){
-						user_words = words_till_now;
-					}
-
-					if(book.part[i].chapter[j].subchapter[k].id.localeCompare(lecture_mark.subchapter_id) == 0){
-						lecture_words = words_till_now;
-					}
-				}
-			}
-		}*/
 	}
 	var out = Object();
 	
@@ -147,6 +117,12 @@ function calculate_words(book,user_mark,lecture_mark){
 }
 
 function add_prog_menu(){
+    
+    if(php_vars.book_length.length == 0){
+        console.warn("book statistic not calculated!");
+        return;
+    }
+    
 	var book_data = calculate_words(php_vars.book_length,php_vars.bookmark,php_vars.lecture_progress);
     console.log(book_data);
 	
@@ -198,7 +174,7 @@ function add_bookmark(){
 function add_progress_circle(mark,color){
     if(mark == null){return;} //no progress set
     
-	if(mark.subchapter_id.length != 0){
+	if(typeof mark.subchapter_id != 'undefined' && mark.subchapter_id.length != 0){
 		$('#'+mark.subchapter_id).append("<div class='prog_circle "+color+"'></div>").css('position','relative');
 		if($('.section a[ href*="'+mark.subchapter_id+'"]').append("<div class='prog_circle "+color+"'></div>").css('position','relative').length > 0){
 			//console.log("submenu found");
@@ -209,27 +185,42 @@ function add_progress_circle(mark,color){
 	$('.chapter a[href="'+mark.path+'"]').append("<div class='prog_circle "+color+"'></div>").css('position','relative');
 }
 
-function add_chapter_length(){
-    var subchapters = Object();
-    var max_length = 0;
-    $('.entry-content').find('h1.in-list').each(function(){
-        var text = "";
-        $(this).nextUntil('h1.in-list').each(function(){
-            text += $(this).text();
-        });
-        
-        var tmp_length = text.split(' ').length;
-        if(tmp_length > max_length){
-            max_length = tmp_length;
-        }
-        
-        subchapters[$(this).prop('id')] = tmp_length;
-        
+function calculate_subchapter_length(chapter){
+    var out = Object();
+    if(chapter.subchapters == 0){
+        console.log("no subchapters");
+        return out;
+    }
+    
+    $.each(chapter.subchapter,function(index,subchapter){
+        out[subchapter.id] = subchapter.words;
     });
     
-    //console.log(subchapters);
+    return out;
+}
+
+function add_chapter_length(){
+    var current_chapter;
+    //get current chapter
+    for(var i=0;i<php_vars.book_length.part.length;i++){
+        $.each(php_vars.book_length.part[i].chapter,function( index, value ) {
+            if(value.id==php_vars.chapter_id){
+                current_chapter = value;
+            }
+        });
+    }
     
-    $.each(subchapters, function (key, val) {
+    var subchapter_length = calculate_subchapter_length(current_chapter);
+    console.log(subchapter_length);
+    
+    var max_length = 0;
+    $.each(subchapter_length, function (key, val) {
+        if(max_length < val){
+            max_length = val;
+        }
+    });
+    
+    $.each(subchapter_length, function (key, val) {
         var l = (val/max_length)*100-100;
         $('.section a[ href*="'+key+'"]').parent().append('<div class="progressBarContainer noBorder small"><div class="overflow_hidden"><div class="progressBar blue" style="transform:translateX('+String(l)+'%)"></div></div></div>');
     });
@@ -239,8 +230,8 @@ function add_chapter_length(){
 function save_bookmark(){
 	var cutoff = $(window).scrollTop();
 	var subchapter_id = "";
-	$('.entry-content').find( "h1.in-list" ).each(function(){
-		if($(this).offset().top - 20 > cutoff){
+	$('.entry-content').find( "h1" ).each(function(){
+		if($(this).offset().top - scroll_cutoff > cutoff){
 			return false; // stops the iteration after the first one on screen
 		}
 		subchapter_id = $(this).prop('id');
@@ -265,6 +256,7 @@ function save_bookmark(){
 			
 			//reset status point
 			$('.prog_circle.green').remove();
+            php_vars.bookmark = Array();
 			php_vars.bookmark.subchapter_id = subchapter_id;
 			add_progress_circle(php_vars.bookmark,"green");
 		}
@@ -274,8 +266,8 @@ function save_bookmark(){
 function save_lecture_progress(){
 	var cutoff = $(window).scrollTop();
 	var subchapter_id = "";
-	$('.entry-content').find( "h1.in-list" ).each(function(){
-		if($(this).offset().top -25 > cutoff){
+	$('.entry-content').find( "h1" ).each(function(){
+		if($(this).offset().top - scroll_cutoff> cutoff){
 			return false;
 		}
 		subchapter_id = $(this).prop('id');
@@ -296,6 +288,7 @@ function save_lecture_progress(){
 		if(response >= 1){
 			//reset status point
 			$('.prog_circle.orange').remove();
+            php_vars.lecture_progress = Array();
 			php_vars.lecture_progress.subchapter_id = subchapter_id;
 			add_progress_circle(php_vars.lecture_progress,"orange");
 		}
