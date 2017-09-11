@@ -13,7 +13,7 @@
 			add_continue_btn();
 			add_prog_menu();
 		}else{
-            add_chapter_length();
+            //add_chapter_length();
         }
         add_bookmark();
         

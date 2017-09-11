@@ -19,6 +19,8 @@
 
     <h2><?php echo esc_html(get_admin_page_title()); ?></h2>
     
+
+    
     <form action="<?php echo admin_url( 'admin-post.php' ); ?>" method="post">
         <input type="hidden" name="action" value="delete_data">
         <input type="hidden" name="_wp_http_referer" value="<?php echo $redirect; ?>">

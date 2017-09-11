@@ -14,7 +14,7 @@
  * Plugin Name:       Learning progress
  * Plugin URI:        https://mskript.ethz.ch/
  * Description:       displays the learning/reading progress in a PressBook of a user 
- * Version:           0.0.2
+ * Version:           1.0.0
  * Author:            Lorin Muehlebach
  * Author URI:        https://www.ee.ethz.ch/de/departement/personen-a-bis-z/person-detail.html?persid=208843
  * License:           GPL-2.0+
@@ -71,8 +71,3 @@ function run_prog() {
 
 }
 run_prog();
-
-function prog_cover(){
-    //echo "learning progress active";
-    //include('test.php');
-}

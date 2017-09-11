@@ -57,12 +57,19 @@ function get_book_lenght($book, $include_private = false, $front_back_matter = f
                 continue;
             }
             
+            /*
+            if($chapter['ID'] == 92){
+                echo $post;
+            }
+            */
 
             //process html
             $doc = new DOMDocument();
-            $doc->loadHTML($post);    
+            $doc->loadHTML($post);
+            //echo $post;
             $selector = new DOMXPath($doc);
-            $result = $selector->query('//h1'); //get all h1 elements
+            /*
+            $result = $selector->query('//h1'); //get all h1 elements            
             foreach($result as $index=>$node) {
                 $subchapters[$index]['subchapter_title'] = $node->nodeValue;
                 $subchapters[$index]['id'] = $node->getAttribute('id');
@@ -74,6 +81,19 @@ function get_book_lenght($book, $include_private = false, $front_back_matter = f
                 foreach($content as $val){
                     $text .= $val->nodeValue;
                 }
+                
+                if($chapter['ID'] == 92){
+                    var_dump($content);
+                    echo "<br> Subchapter (".$node->nodeValue.") Text: ".$text."<br>";
+                    
+                    $content2 = $selector->evaluate('//h1['.($index+1).']/following::text()[not(ancestor::h1)]');
+                    $text2 = '';
+                    foreach($content2 as $val){
+                        $text2 .= $val->nodeValue;
+                    }
+                    echo "<br> following text: ".$text2."<br>";
+                }
+                
 
                 $count_images = $selector->evaluate('count(//h1['.($index+1).']/following::img[count(preceding::h1)<='.($index+1).'])');
                 $count_videos = $selector->evaluate('count(//h1['.($index+1).']/following::iframe[count(preceding::h1)<='.($index+1).'])');
@@ -95,12 +115,15 @@ function get_book_lenght($book, $include_private = false, $front_back_matter = f
                 //$subchapters[$index]['content'] = $text;
                 $chapter_array['chapter'][$chapter_index]['subchapter'] = $subchapters;
             }
+            */
 
-            if($chapter_array['chapter'][$chapter_index]['subchapters']==0){
+            //if($chapter_array['chapter'][$chapter_index]['subchapters']==0){
+            if(true){
                 //improvement: only count words inside div[class = entry-content]
 
                 $count_images = $selector->evaluate('count(//img)');
                 $count_videos = $selector->evaluate('count(//iframe)');
+                $count_videos += substr_count($post,"https://youtu");
 
                 $chapter_array['chapter'][$chapter_index]['words']     =  str_word_count($post);
                 $chapter_array['chapter'][$chapter_index]['h5p']       =  substr_count($post,"[h5p");
