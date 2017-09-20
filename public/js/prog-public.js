@@ -1,12 +1,12 @@
 (function ($) {
 	'use strict';
-	console.log(php_vars);
+	//console.log(prog_vars);
     
     
 
     //only manipulate page when the document is ready
     $(function(){
-		//console.log(php_vars);
+		//console.log(prog_vars);
         
         //Test if on coverpage
 		if(window.location.href.indexOf("chapter") == -1){
@@ -18,18 +18,18 @@
         add_bookmark();
         
         try{
-        add_progress_circle(php_vars.lecture_progress,"orange");
+        add_progress_circle(prog_vars.lecture_progress,"orange");
         }catch(e){}
         
         try{
-		add_progress_circle(php_vars.bookmark,"green");
+		add_progress_circle(prog_vars.bookmark,"green");
         }catch(e){}
         
     });
     
     $(window).load(function () {
         //console.log("Jquery version: "+jQuery.fn.jquery);
-        //console.log(php_vars);
+        //console.log(prog_vars);
     });
 
 })(jQuery);
@@ -37,14 +37,14 @@
 var scroll_cutoff = 40;
 
 function add_continue_btn(){
-	if(php_vars.bookmark.length == 0){
+	if(prog_vars.bookmark.length == 0){
 		console.log("no bookmark set");
 		return;
 	}
 	
 	try {
-		if(php_vars.bookmark.path.length != 0 && ~php_vars.bookmark.path.indexOf("chapter")){
-			$(".call-to-action").append('<a class="btn red" href="'+php_vars.bookmark.path+"#"+php_vars.bookmark.subchapter_id+'"><span class="continue-icon"></span>Continue</a>');
+		if(prog_vars.bookmark.path.length != 0 && ~prog_vars.bookmark.path.indexOf("chapter")){
+			$(".call-to-action").append('<a class="btn red" href="'+prog_vars.bookmark.path+"#"+prog_vars.bookmark.subchapter_id+'"><span class="continue-icon"></span>Continue</a>');
 		}
 	}catch(err) {
     	console.log(err.message);
@@ -118,27 +118,27 @@ function calculate_words(book,user_mark,lecture_mark){
 
 function add_prog_menu(){
     
-    if(php_vars.book_length.length == 0){
+    if(prog_vars.book_length.length == 0){
         console.warn("book statistic not calculated!");
         return;
     }
     
-	var book_data = calculate_words(php_vars.book_length,php_vars.bookmark,php_vars.lecture_progress);
-    console.log(book_data);
+	var book_data = calculate_words(prog_vars.book_length,prog_vars.bookmark,prog_vars.lecture_progress);
+    //console.log(book_data);
 	
-	var reading_time_approx_h = parseInt(php_vars.book_length.global.words/(175*60));
-	var reading_time_approx_m = parseInt((php_vars.book_length.global.words/175)%60);
+	var reading_time_approx_h = parseInt(prog_vars.book_length.global.words/(175*60));
+	var reading_time_approx_m = parseInt((prog_vars.book_length.global.words/175)%60);
 	
-	console.log("user word count: "+book_data['user_words']+" lecture word count: "+book_data['lecture_words']);
+	//console.log("user word count: "+book_data['user_words']+" lecture word count: "+book_data['lecture_words']);
 	
-    $(".third-block-wrap").append('<div class="third-block clearfix"><h2>Learning Progress</h2><p>Reading Time (approx.): '+reading_time_approx_h+'h '+reading_time_approx_m+'min ('+php_vars.book_length.global.words+' words)</p><p>Additional material:  '+php_vars.book_length.global.h5p+' interactivity modules, '+php_vars.book_length.global.videos+' videos, '+php_vars.book_length.global.img+' images, '+php_vars.book_length.global.formulas+' formulas</p><div class="progressBarContainer"><div class="overflow_hidden"><div class="progressBar orange"></div><div class="progressBar green"></div></div></div></div><p></p>');
+    $(".third-block-wrap").append('<div class="third-block clearfix"><h2>Learning Progress</h2><p>Reading Time (approx.): '+reading_time_approx_h+'h '+reading_time_approx_m+'min ('+prog_vars.book_length.global.words+' words)</p><p>Additional material:  '+prog_vars.book_length.global.h5p+' interactivity modules, '+prog_vars.book_length.global.videos+' videos, '+prog_vars.book_length.global.img+' images, '+prog_vars.book_length.global.formulas+' formulas</p><div class="progressBarContainer"><div class="overflow_hidden"><div class="progressBar orange"></div><div class="progressBar green"></div></div></div></div><p></p>');
 	
 	var container_width = $(".progressBarContainer").width();
 	var lastlabel = -100;
 	book_data['chapters'].forEach(function(element,index) {
 		if(index != 0){
 			var label = (index+1);
-			var pos = element/(php_vars.book_length.global.words);
+			var pos = element/(prog_vars.book_length.global.words);
 			if((pos-lastlabel)*container_width < 20){
 				label = "";
 			}else{
@@ -150,13 +150,13 @@ function add_prog_menu(){
 	});
     
     $.each(book_data['h5p'], function(key,value) {
-        pos = key/(php_vars.book_length.global.words);
+        pos = key/(prog_vars.book_length.global.words);
         $(".progressBarContainer").append('<div class="progressBar marker no_markup" style="transform: translateX('+String((pos*100)-100)+'%)"><div class="circle blue"></div></div>');
 	});
 	
 	
-	var user_prog = book_data['user_words']/(php_vars.book_length.global.words);
-	var lecture_prog = book_data['lecture_words']/(php_vars.book_length.global.words);
+	var user_prog = book_data['user_words']/(prog_vars.book_length.global.words);
+	var lecture_prog = book_data['lecture_words']/(prog_vars.book_length.global.words);
 	$(".progressBar.green").css('transform','translateX('+String((user_prog*100)-100)+'%)');
 	$(".progressBar.orange").css('transform','translateX('+String((lecture_prog*100)-100)+'%)');
 }
@@ -165,7 +165,7 @@ function add_bookmark(){
 	if(window.location.href.indexOf("chapter") > -1){
 		$(".a11y-toolbar ul").append('<li><a href="javascript:save_bookmark();" role="button" id="save_bookmark" title="set Bookmark"><span class="dashicons dashicons-book"></span></a></li>');
 
-		if(php_vars.admin == 1){
+		if(prog_vars.admin == 1){
 			$(".a11y-toolbar ul").append('<li><a href="javascript:save_lecture_progress();" role="button" style="background-color:rgb(255, 187, 0);" id="save_lecture_progress" title="lecture progress"><span class="dashicons dashicons-book"></span></a></li>');
 		}
 	}
@@ -202,9 +202,9 @@ function calculate_subchapter_length(chapter){
 function add_chapter_length(){
     var current_chapter;
     //get current chapter
-    for(var i=0;i<php_vars.book_length.part.length;i++){
-        $.each(php_vars.book_length.part[i].chapter,function( index, value ) {
-            if(value.id==php_vars.chapter_id){
+    for(var i=0;i<prog_vars.book_length.part.length;i++){
+        $.each(prog_vars.book_length.part[i].chapter,function( index, value ) {
+            if(value.id==prog_vars.chapter_id){
                 current_chapter = value;
             }
         });
@@ -239,16 +239,16 @@ function save_bookmark(){
     
     var data = {
         'action': 'prog_save_bookmark',
-        'progNonce' : php_vars.ajax_nonce,
-		'book_id' : php_vars.book_id,
-		'chapter_id' :php_vars.chapter_id,
+        'progNonce' : prog_vars.ajax_nonce,
+		'book_id' : prog_vars.book_id,
+		'chapter_id' :prog_vars.chapter_id,
 		'subchapter_id': subchapter_id,
-        'path': php_vars.path
+        'path': prog_vars.path
     };
     
     console.log(data);
     
-    jQuery.post(php_vars.ajax_url, data, function(response) {
+    jQuery.post(prog_vars.ajax_url, data, function(response) {
 		console.log('Got this from the server: ' + response);
 		if(response >= 1){
 			//TODO better animation
@@ -256,9 +256,9 @@ function save_bookmark(){
 			
 			//reset status point
 			$('.prog_circle.green').remove();
-            php_vars.bookmark = Array();
-			php_vars.bookmark.subchapter_id = subchapter_id;
-			add_progress_circle(php_vars.bookmark,"green");
+            prog_vars.bookmark = Array();
+			prog_vars.bookmark.subchapter_id = subchapter_id;
+			add_progress_circle(prog_vars.bookmark,"green");
 		}
 	});
 }
@@ -275,22 +275,22 @@ function save_lecture_progress(){
     
     var data = {
         'action': 'prog_save_lecture_progress',
-        'progNonce' : php_vars.ajax_nonce,
-		'chapter_id': php_vars.chapter_id,
+        'progNonce' : prog_vars.ajax_nonce,
+		'chapter_id': prog_vars.chapter_id,
 		'subchapter_id': subchapter_id,
-        'path': php_vars.path
+        'path': prog_vars.path
     };
     
     console.log(data);
     
-    jQuery.post(php_vars.ajax_url, data, function(response) {
+    jQuery.post(prog_vars.ajax_url, data, function(response) {
 		console.log('Got this from the server: ' + response);
 		if(response >= 1){
 			//reset status point
 			$('.prog_circle.orange').remove();
-            php_vars.lecture_progress = Array();
-			php_vars.lecture_progress.subchapter_id = subchapter_id;
-			add_progress_circle(php_vars.lecture_progress,"orange");
+            prog_vars.lecture_progress = Array();
+			prog_vars.lecture_progress.subchapter_id = subchapter_id;
+			add_progress_circle(prog_vars.lecture_progress,"orange");
 		}
 	});
 }

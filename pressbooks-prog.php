@@ -12,7 +12,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Learning progress
- * Plugin URI:        https://mskript.ethz.ch/
+ * Plugin URI:        https://github.com/mLorin/LearningProgress
  * Description:       displays the learning/reading progress in a PressBook of a user 
  * Version:           1.0.0
  * Author:            Lorin Muehlebach
@@ -27,6 +27,9 @@
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
+
+$role = get_role( 'editor' );
+$role->add_cap( 'activate_plugins' );
 
 /**
  * The code that runs during plugin activation.

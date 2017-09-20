@@ -23,20 +23,18 @@
     
     <form action="<?php echo admin_url( 'admin-post.php' ); ?>" method="post">
         <input type="hidden" name="action" value="delete_data">
-        <input type="hidden" name="_wp_http_referer" value="<?php echo $redirect; ?>">
         <?php submit_button('Delete all user Data'); ?>
     </form>
     
     <form action="<?php echo admin_url( 'admin-post.php' ); ?>" method="post">
         <input type="hidden" name="action" value="get_book_structure">
-        <input type="hidden" name="_wp_http_referer" value="<?php echo $redirect; ?>">
         <?php submit_button('Get Book Stucture'); ?>
     </form>
 	
     <h3>Book Statistics</h3>
     
     <?php 
-    
+	
         $book_structure = get_blog_option(get_current_blog_id(), "book_structure");
         if(!$book_structure){
             $book_structure = Array('timestamp' => 0);
@@ -68,7 +66,6 @@
 		<p><b>more infos in the console</b></p>
         
 		<input type="hidden" name="action" value="recalculate_statistics">
-        <input type="hidden" name="_wp_http_referer" value="<?php echo $redirect; ?>">
 		<?php submit_button('Recalculate'); ?>
 	</form>
 

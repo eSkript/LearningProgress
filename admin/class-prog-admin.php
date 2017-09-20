@@ -155,14 +155,19 @@ class Prog_Admin {
 	
 	//recalculate book statistics
 	public function recalculate_statistics_settings() {
-        //get_book_lenght(pb_get_book_structure());
         
-        echo update_blog_option(get_current_blog_id(), "book_structure", get_book_lenght(pb_get_book_structure()));
+        get_book_lenght(pb_get_book_structure(),true);
         
+        echo "<br> update book statistics: ".update_blog_option(get_current_blog_id(), "book_structure", get_book_lenght(pb_get_book_structure()));
         
+        echo "<br><a href=".$_SERVER["HTTP_REFERER"].">back</a>";
+        
+        /*
         if (isset($_SERVER["HTTP_REFERER"])) {
             header("Location: " . $_SERVER["HTTP_REFERER"]);
         }
+        */
+        
         
 		die();
         

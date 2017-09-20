@@ -153,6 +153,8 @@ class Prog {
 	 * @access   private
 	 */
 	private function define_admin_hooks() {
+		
+		remove_all_filters('all_plugins');
 
 		$plugin_admin = new Prog_Admin( $this->get_plugin_name(), $this->get_version() );
 
@@ -160,7 +162,7 @@ class Prog {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
         
         // Add menu item
-        $this->loader->add_action( 'admin_menu', $plugin_admin, 'add_plugin_admin_menu' );
+        $this->loader->add_action( 'admin_menu', $plugin_admin, 'add_plugin_admin_menu' );	
 
         // Add Settings link to the plugin
         $plugin_basename = plugin_basename( plugin_dir_path( __DIR__ ) . $this->plugin_name . '.php' );
@@ -169,8 +171,9 @@ class Prog {
         // Save/Update our plugin options
         $this->loader->add_action('admin_init', $plugin_admin, 'options_update');
 		
-        $this->loader->add_action('admin_post_get_book_structure', $plugin_admin, 'get_book_structure_and_return_to_console' ); //recalculate button in settings panel
+        $this->loader->add_action('admin_post_get_book_structure', $plugin_admin, 'get_book_structure_and_return_to_console' );
 		$this->loader->add_action('admin_post_recalculate_statistics', $plugin_admin, 'recalculate_statistics_settings' ); //recalculate button in settings panel
+        
         add_action('save_post','recalculate_stats' ); //recalculate if content is changed
         
         add_action('admin_post_delete_data','delete_data' );

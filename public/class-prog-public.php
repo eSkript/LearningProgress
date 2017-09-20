@@ -91,7 +91,7 @@ class Prog_Public {
         
         wp_register_script($this->plugin_name."js", plugin_dir_url( __FILE__ ) . "js/prog-public.js" );
         wp_enqueue_script($this->plugin_name."js");
-        wp_localize_script($this->plugin_name."js", "php_vars", $this->load_data());
+        wp_localize_script($this->plugin_name."js", "prog_vars", $this->load_data());
     }
     
     public function load_data(){
@@ -108,8 +108,11 @@ class Prog_Public {
             $user_progress = $bookmarks[get_current_blog_id()];
         }
         
-        $ref = eskript_reference_for_id(get_the_ID()); //TODO independent of e-script
-        $href = get_permalink($ref['post']);
+        $href = "";
+        if(strlen(get_the_ID()) != 0){
+            $ref = eskript_reference_for_id(get_the_ID()); //TODO independent of e-script
+            $href = get_permalink($ref['post']);
+        }
 		
         
         $array = array(
@@ -144,8 +147,6 @@ class Prog_Public {
 		$bookmarks[$_POST['book_id']] = Array( "chapter_id" => $_POST['chapter_id'], "subchapter_id" => $_POST['subchapter_id'],"path" => $_POST['path']);
 		
 		echo update_user_meta( get_current_user_id(), 'prog_bookmark', $bookmarks);
-        
-        //delete_user_meta( get_current_user_id(), 'prog_bookmark');
         
 	    wp_die(); // this is required to terminate immediately and return a proper response
     }

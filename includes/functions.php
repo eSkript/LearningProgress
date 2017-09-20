@@ -1,6 +1,36 @@
 <?php
 
-function get_book_lenght($book, $include_private = false, $front_back_matter = false){
+class ErrorTrap {
+  protected $callback;
+  protected $errors = array();
+  function __construct($callback) {
+    $this->callback = $callback;
+  }
+  function call() {
+    $result = null;
+    set_error_handler(array($this, 'onError'));
+    try {
+      $result = call_user_func_array($this->callback, func_get_args());
+    } catch (Exception $ex) {
+      restore_error_handler();        
+      throw $ex;
+    }
+    restore_error_handler();
+    return $result;
+  }
+  function onError($errno, $errstr, $errfile, $errline) {
+    $this->errors[] = array($errno, $errstr, $errfile, $errline);
+  }
+  function ok() {
+    return count($this->errors) === 0;
+  }
+  function errors() {
+    return $this->errors;
+  }
+}
+
+
+function get_book_lenght($book, $warnings=false,$include_private = false, $front_back_matter = false){
     $out = Array();
 
     $out['global'] = Array('parts'     => 0,
@@ -65,8 +95,21 @@ function get_book_lenght($book, $include_private = false, $front_back_matter = f
 
             //process html
             $doc = new DOMDocument();
-            $doc->loadHTML($post);
-            //echo $post;
+            //$doc->loadHTML($post);
+            
+            //Disable warning outputs
+            $caller = new ErrorTrap(array($doc, 'loadHTML'));
+            $caller->call($post);
+            
+            if ($warnings && !$caller->ok()) {
+                var_dump($caller->errors());
+                echo "<br>";
+                echo $post;
+                echo "<br>";
+                //TODO handle warnings
+            }
+            
+
             $selector = new DOMXPath($doc);
             /*
             $result = $selector->query('//h1'); //get all h1 elements            
@@ -180,7 +223,7 @@ function find_html_tag($string,$tag,$searchposition){
 }
 
 function recalculate_stats($book){
-    echo update_blog_option(get_current_blog_id(), "book_structure", get_book_lenght(pb_get_book_structure()));
+    update_blog_option(get_current_blog_id(), "book_structure", get_book_lenght(pb_get_book_structure()));
 }
 
 function delete_data(){
