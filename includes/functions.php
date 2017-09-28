@@ -29,6 +29,8 @@ class ErrorTrap {
   }
 }
 
+include("simple_html_dom.php");
+
 
 function get_book_lenght($book, $warnings=false,$include_private = false, $front_back_matter = false){
     $out = Array();
@@ -58,7 +60,7 @@ function get_book_lenght($book, $warnings=false,$include_private = false, $front
         $chapter_array = Array('part_title' => $part['post_title']);
         $chapter_array['chapter'] = Array();
 
-        foreach ($part['chapters'] as $chapter){         
+        foreach ($part['chapters'] as $chapter){			
             if(!$include_private && strcmp($chapter['post_status'],'private')==0){
                 continue;
             }
@@ -86,12 +88,7 @@ function get_book_lenght($book, $warnings=false,$include_private = false, $front
                 $out['global']['chapters'] += 1;
                 continue;
             }
-            
-            /*
-            if($chapter['ID'] == 92){
-                echo $post;
-            }
-            */
+			
 
             //process html
             $doc = new DOMDocument();
@@ -100,8 +97,17 @@ function get_book_lenght($book, $warnings=false,$include_private = false, $front
             //Disable warning outputs
             $caller = new ErrorTrap(array($doc, 'loadHTML'));
             $caller->call($post);
+			
+			/*
+			if($warnings){
+				var_dump(countElements($post));
+				echo "<br>";
+				var_dump(eskript_find_references($post));
+				echo "<br><br>";
+			}
+			*/
             
-            if ($warnings && !$caller->ok()) {
+            if (false && $warnings && !$caller->ok()) {
                 var_dump($caller->errors());
                 echo "<br>";
                 echo $post;
@@ -111,42 +117,28 @@ function get_book_lenght($book, $warnings=false,$include_private = false, $front
             
 
             $selector = new DOMXPath($doc);
-            /*
-            $result = $selector->query('//h1'); //get all h1 elements            
+			
+            $result = $selector->query('//h1[not(@class="not-in-list")]'); //get all h1 elements
             foreach($result as $index=>$node) {
-                $subchapters[$index]['subchapter_title'] = $node->nodeValue;
-                $subchapters[$index]['id'] = $node->getAttribute('id');
-
                 //get content between subchapters
-                $content = $selector->evaluate('//h1['.($index+1).']/following::text()[count(preceding::h1)<='.($index+1).'][not(ancestor::h1)]');
+                $content = $selector->evaluate('//h1[not(@class="not-in-list")]['.($index+1).']/following::text()[count(preceding::h1[not(@class="not-in-list")])='.($index+1).'][not(ancestor::h1)]');
+				
+				$images = $selector->evaluate('count(//h1[not(@class="not-in-list")]['.($index+1).']/following::img[count(preceding::h1[not(@class="not-in-list")])='.($index+1).'][not(ancestor::h1)])');
+				$videos = $selector->evaluate('count(//h1[not(@class="not-in-list")]['.($index+1).']/following::iframe[count(preceding::h1[not(@class="not-in-list")])='.($index+1).'][not(ancestor::h1)])');
 
                 $text = '';
                 foreach($content as $val){
                     $text .= $val->nodeValue;
                 }
-                
-                if($chapter['ID'] == 92){
-                    var_dump($content);
-                    echo "<br> Subchapter (".$node->nodeValue.") Text: ".$text."<br>";
-                    
-                    $content2 = $selector->evaluate('//h1['.($index+1).']/following::text()[not(ancestor::h1)]');
-                    $text2 = '';
-                    foreach($content2 as $val){
-                        $text2 .= $val->nodeValue;
-                    }
-                    echo "<br> following text: ".$text2."<br>";
-                }
-                
+				
+				//echo $node->nodeValue."<br>".$text."<br>";
+				
+				$indexed_content = countElements($text,$images,$videos);      
+				
 
-                $count_images = $selector->evaluate('count(//h1['.($index+1).']/following::img[count(preceding::h1)<='.($index+1).'])');
-                $count_videos = $selector->evaluate('count(//h1['.($index+1).']/following::iframe[count(preceding::h1)<='.($index+1).'])');
-                $count_videos += substr_count($text,"https://youtu");
-
-                $subchapters[$index]['words']    = str_word_count($text);
-                $subchapters[$index]['h5p']      = substr_count($text,"[h5p");
-                $subchapters[$index]['videos']   = $count_videos;
-                $subchapters[$index]['img']      = $count_images;
-                $subchapters[$index]['formulas'] = substr_count($text,"$$")/2+substr_count($text,"[latex]");
+                $subchapters[$index]   					 = $indexed_content;
+				$subchapters[$index]['subchapter_title'] = $node->nodeValue;
+                $subchapters[$index]['id'] 				 = $node->getAttribute('id');
 
                 $chapter_array['chapter'][$chapter_index]['words']     += $subchapters[$index]['words'];
                 $chapter_array['chapter'][$chapter_index]['h5p']       += $subchapters[$index]['h5p'];
@@ -158,22 +150,26 @@ function get_book_lenght($book, $warnings=false,$include_private = false, $front
                 //$subchapters[$index]['content'] = $text;
                 $chapter_array['chapter'][$chapter_index]['subchapter'] = $subchapters;
             }
-            */
+			
+			//add content before first subchapter
+			$content = $selector->evaluate('//text()[not(preceding::h1[not(@class="not-in-list")])]');
+				
+			$images = $selector->evaluate('count(//img[not(preceding::h1[not(@class="not-in-list")])])');
+			$videos = $selector->evaluate('count(//iframe[not(preceding::h1[not(@class="not-in-list")])])');
+			
+			$text = '';
+			foreach($content as $val){
+				$text .= $val->nodeValue;
+			}
+			
+			$preceeding_content = countElements($text,$images,$videos);  
 
-            //if($chapter_array['chapter'][$chapter_index]['subchapters']==0){
-            if(true){
-                //improvement: only count words inside div[class = entry-content]
+			$chapter_array['chapter'][$chapter_index]['words']     +=  $preceeding_content["words"];
+			$chapter_array['chapter'][$chapter_index]['h5p']       +=  $preceeding_content["h5p"];
+			$chapter_array['chapter'][$chapter_index]['videos']    +=  $preceeding_content["videos"];
+			$chapter_array['chapter'][$chapter_index]['img']       +=  $preceeding_content["img"];
+			$chapter_array['chapter'][$chapter_index]['formulas']  +=  $preceeding_content["formulas"];                  
 
-                $count_images = $selector->evaluate('count(//img)');
-                $count_videos = $selector->evaluate('count(//iframe)');
-                $count_videos += substr_count($post,"https://youtu");
-
-                $chapter_array['chapter'][$chapter_index]['words']     =  str_word_count($post);
-                $chapter_array['chapter'][$chapter_index]['h5p']       =  substr_count($post,"[h5p");
-                $chapter_array['chapter'][$chapter_index]['videos']    =  $count_videos;
-                $chapter_array['chapter'][$chapter_index]['img']       =  $count_images;
-                $chapter_array['chapter'][$chapter_index]['formulas']  =  substr_count($post,"$$")/2;                    
-            }
 
             $out['global']['words']     += $chapter_array['chapter'][$chapter_index]['words'];
             $out['global']['h5p']       += $chapter_array['chapter'][$chapter_index]['h5p'];
@@ -188,6 +184,19 @@ function get_book_lenght($book, $warnings=false,$include_private = false, $front
         array_push($out['part'],$chapter_array);
     }
     return $out;
+}
+
+function countElements($content,$images,$videos){
+	
+	$out = Array();
+	$out['words'] 	= str_word_count(strip_tags($content));
+	$out['h5p']		= substr_count($content,"[h5p");
+	//TODO improve video count
+	$out['videos']	= $videos + substr_count($content,"https://youtube");
+	$out['img']		= $images;
+	$out['formulas']= substr_count($content,"$$")/2 + substr_count($content,"[latex]");
+	
+	return $out;
 }
 
 //maby replace xPath for this

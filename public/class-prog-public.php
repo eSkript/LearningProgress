@@ -117,6 +117,7 @@ class Prog_Public {
         
         $array = array(
 	    "admin" => current_user_can( 'manage_options' ),
+		"logged_in" => is_user_logged_in(),
         "ajax_url" => admin_url( 'admin-ajax.php' ),
         "ajax_nonce" => wp_create_nonce( "progNonce" ),
         "bookmark" => $user_progress,

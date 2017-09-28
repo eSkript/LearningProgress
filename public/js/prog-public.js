@@ -10,7 +10,9 @@
         
         //Test if on coverpage
 		if(window.location.href.indexOf("chapter") == -1){
-			add_continue_btn();
+			if(prog_vars.logged_in){
+				add_continue_btn();
+			}
 			add_prog_menu();
 		}else{
             //add_chapter_length();
