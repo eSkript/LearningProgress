@@ -132,8 +132,11 @@ function add_prog_menu(){
 	var reading_time_approx_m = parseInt((prog_vars.book_length.global.words/175)%60);
 	
 	//console.log("user word count: "+book_data['user_words']+" lecture word count: "+book_data['lecture_words']);
-	
-    $(".third-block-wrap").append('<div class="third-block clearfix"><h2>Learning Progress</h2><p>Reading Time (approx.): '+reading_time_approx_h+'h '+reading_time_approx_m+'min ('+prog_vars.book_length.global.words+' words)</p><p>Additional material:  '+prog_vars.book_length.global.h5p+' interactivity modules, '+prog_vars.book_length.global.videos+' videos, '+prog_vars.book_length.global.img+' images, '+prog_vars.book_length.global.formulas+' formulas</p><div class="progressBarContainer"><div class="overflow_hidden"><div class="progressBar orange"></div><div class="progressBar green"></div></div></div></div><p></p>');
+    
+    if($("#plugin_page_cover").length>0){
+       $("#plugin_page_cover").append('<div><h2>Learning Progress</h2><p>Reading Time (approx.): '+reading_time_approx_h+'h '+reading_time_approx_m+'min ('+prog_vars.book_length.global.words+' words)</p><p>Additional material:  '+prog_vars.book_length.global.h5p+' interactivity modules, '+prog_vars.book_length.global.videos+' videos, '+prog_vars.book_length.global.img+' images, '+prog_vars.book_length.global.formulas+' formulas</p><div class="progressBarContainer"><div class="overflow_hidden"><div class="progressBar orange"></div><div class="progressBar green"></div></div></div></div>');
+    }else{	
+    $(".third-block-wrap").append('<div class="third-block clearfix"><h2>Learning Progress</h2><p>Reading Time (approx.): '+reading_time_approx_h+'h '+reading_time_approx_m+'min ('+prog_vars.book_length.global.words+' words)</p><p>Additional material:  '+prog_vars.book_length.global.h5p+' interactivity modules, '+prog_vars.book_length.global.videos+' videos, '+prog_vars.book_length.global.img+' images, '+prog_vars.book_length.global.formulas+' formulas</p><div class="progressBarContainer"><div class="overflow_hidden"><div class="progressBar orange"></div><div class="progressBar green"></div></div></div></div><p></p>');}
 	
 	var container_width = $(".progressBarContainer").width();
 	var lastlabel = -100;

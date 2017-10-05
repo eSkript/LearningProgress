@@ -29,9 +29,6 @@ class ErrorTrap {
   }
 }
 
-include("simple_html_dom.php");
-
-
 function get_book_lenght($book, $warnings=false,$include_private = false, $front_back_matter = false){
     $out = Array();
 
