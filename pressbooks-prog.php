@@ -14,7 +14,7 @@
  * Plugin Name:       Learning progress
  * Plugin URI:        https://github.com/mLorin/LearningProgress
  * Description:       displays the learning/reading progress in a PressBook of a user 
- * Version:           1.0.0
+ * Version:           1.2.0
  * Author:            Lorin Muehlebach
  * Author URI:        https://www.ee.ethz.ch/de/departement/personen-a-bis-z/person-detail.html?persid=208843
  * License:           GPL-2.0+
